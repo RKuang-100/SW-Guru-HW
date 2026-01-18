@@ -23,27 +23,32 @@ CONFIG = {
 
 def read_text_file(filename):
     """Reads text from a file - pure I/O function"""
+    # Q1: Pure I/O - no processing, no printing
     with open(filename) as f:
         return f.read()
 
 
 def clean_word(word, punctuation):
     """Removes punctuation from a single word"""
+    # Q2/Q3: Single job - cleans one word, punctuation from CONFIG
     return word.strip(punctuation)
 
 
 def normalize_text(text):
     """Converts text to lowercase and splits into words"""
+    # Q2: Single responsibility - normalizes text only
     return text.lower().split()
 
 
 def filter_stopwords(words, stopwords):
     """Removes stopwords from word list"""
+    # Q2/Q3: Filters stopwords - list from CONFIG, not hardcoded
     return [word for word in words if word and word not in stopwords]
 
 
 def count_word_frequencies(words):
     """Counts how many times each word appears"""
+    # Q2: Single responsibility - just counts, doesn't clean or filter
     counts = {}
     for word in words:
         counts[word] = counts.get(word, 0) + 1
@@ -52,16 +57,19 @@ def count_word_frequencies(words):
 
 def sort_words_by_frequency(counts):
     """Sorts words by frequency, highest first"""
+    # Q2: Single responsibility - just sorts, doesn't count
     return sorted(counts.items(), key=lambda x: x[1], reverse=True)
 
 
 def get_top_words(sorted_words, top_n):
     """Gets the top N most frequent words"""
+    # Q2/Q3: Gets top N - value from CONFIG, not hardcoded
     return sorted_words[:top_n]
 
 
 def clean_all_words(words, punctuation):
     """Cleans all words and removes empty ones"""
+    # Q2/Q4: Cleans list using clean_word(), filters empty strings
     cleaned_words = []
     for word in words:
         cleaned = clean_word(word, punctuation)
@@ -72,6 +80,7 @@ def clean_all_words(words, punctuation):
 
 def build_result_dict(counts, top_words):
     """Builds the result dictionary with counts and stats"""
+    # Q1/Q2: Builds result structure - separates data from presentation
     return {
         'counts': counts,
         'top_words': top_words,
@@ -96,6 +105,7 @@ def build_result_dict(counts, top_words):
 
 def process_text(text, config):
     """Main processing pipeline - orchestrates all the model functions"""
+    # Q1: Model function - processes data, NO printing
     words = normalize_text(text)
     cleaned_words = clean_all_words(words, config['punctuation'])
     filtered_words = filter_stopwords(cleaned_words, config['stopwords'])
@@ -112,16 +122,19 @@ def process_text(text, config):
 
 def format_bar(count, bar_char):
     """Creates a bar visualization for word count"""
+    # Q1/Q3: Presentation function - bar_char from CONFIG
     return bar_char * count
 
 
 def format_word_line(index, word, count, bar, word_width, count_width):
     """Formats a single line of word output"""
+    # Q1/Q3: Formats one line - widths from CONFIG
     return f"{index:2}. {word:{word_width}} {count:{count_width}} {bar}"
 
 
 def print_header(filename):
     """Prints the header section"""
+    # Q1: Presentation function - only prints, doesn't process
     print(f"\n{'='*50}")
     print(f"WORD FREQUENCY ANALYSIS - {filename}")
     print(f"{'='*50}\n")
@@ -129,12 +142,14 @@ def print_header(filename):
 
 def print_summary(result):
     """Prints the summary statistics"""
+    # Q1: Presentation function - displays stats from model
     print(f"Total words (after removing stopwords): {result['total_words']}")
     print(f"Unique words: {result['unique_words']}\n")
 
 
 def print_top_words(result, config):
     """Prints the top N words with formatting"""
+    # Q1/Q3: Prints top words - formatting options from CONFIG
     print(f"Top {config['top_n']} most frequent words:\n")
     
     for i, (word, count) in enumerate(result['top_words'], 1):
@@ -148,6 +163,7 @@ def print_top_words(result, config):
 
 def print_results(result, filename, config):
     """Main presentation function - orchestrates all printing"""
+    # Q1/Q2: Orchestrates printing - coordinates presentation functions
     print_header(filename)
     print_summary(result)
     print_top_words(result, config)
