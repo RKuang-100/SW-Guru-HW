@@ -2,9 +2,9 @@
 """Word frequency counter - refactored version following SE heuristics"""
 
 # Q3: What Mechanism vs Policy issues did I find?
-# AQ3: Found hardcoded stopwords, punctuation, top_n value, and formatting stuff all mixed into the code.
-#      Fixed by moving ALL of that into this CONFIG dict at the top. Now if you want different stopwords
-#      or want to show top 20 instead of 10, just change the config - no need to dig through code.
+# AQ3: Found hardcoded stopwords, punctuation, top_n value, and formatting in the code.
+#      Fixed by moving all of that into CONFIG dict at the top. Now if you want different stopwords
+#      or want to show top 20 instead of 10, just change the config.
 CONFIG = {
     'stopwords': ["the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for",
                   "of", "is", "was", "are", "were", "be", "been", "with"],
@@ -17,9 +17,9 @@ CONFIG = {
 
 
 # Q1: What Separation of Concerns issues did I find?
-# AQ1: The original code mixed everything together - reading files, processing data, and printing
+# AQ1: The original code mixed everything together such as reading files, processing data, and printing
 #      all in one function. Fixed by splitting into model functions (below) that only work with data,
-#      and presentation functions (further down) that only handle printing. No mixing!
+#      and presentation functions that only handle printing. This deals with the Separation of Concerns issues we found.
 
 def read_text_file(filename):
     """Reads text from a file - pure I/O function"""
@@ -90,22 +90,22 @@ def build_result_dict(counts, top_words):
 
 
 # Q2: What Single Responsibility Principle issues did I find?
-# AQ2: The original count_words() function was doing way too much - reading, cleaning, counting,
-#      sorting, filtering, formatting, printing... everything! Fixed by breaking it into small
-#      functions where each one does exactly ONE job:
-#      - read_text_file: just reads a file
-#      - clean_word: just strips punctuation from one word
-#      - clean_all_words: just cleans a list of words
-#      - normalize_text: just lowercases and splits
-#      - filter_stopwords: just removes stopwords
-#      - count_word_frequencies: just counts occurrences
-#      - sort_words_by_frequency: just sorts
-#      - get_top_words: just slices the top N
-#      - build_result_dict: just builds the result structure
+# AQ2: The original count_words() function was doing too many things like reading, cleaning, counting,
+#      sorting, filtering, formatting, and printing. Fixed by breaking it into small
+#      functions where each one does exactly one job:
+#      - read_text_file: reads a file
+#      - clean_word: cuts punctuation from one word
+#      - clean_all_words: cleans a list of words
+#      - normalize_text: lowercases and splits
+#      - filter_stopwords: removes stopwords
+#      - count_word_frequencies: counts occurrences
+#      - sort_words_by_frequency: sorts
+#      - get_top_words: slices the top N
+#      - build_result_dict: builds the result structure
 
 def process_text(text, config):
     """Main processing pipeline - orchestrates all the model functions"""
-    # Q1: Model function - processes data, NO printing
+    # Q1: Model function - processes data, no printing
     words = normalize_text(text)
     cleaned_words = clean_all_words(words, config['punctuation'])
     filtered_words = filter_stopwords(cleaned_words, config['stopwords'])
@@ -115,9 +115,9 @@ def process_text(text, config):
     return build_result_dict(counts, top_words)
 
 
-# Q1 continued: Here are the presentation functions - all the printing stuff separated out
-# AQ1: All the print statements got moved here. Now if you want to change how things look,
-#      you only touch these functions. The data processing functions above don't care about
+# Q1 continued: Here are the presentation functions (printing)
+# AQ1: All the print statements were moved here. Now if you want to change how things look,
+#      you only need to modify these functions. The data processing functions above don't care about
 #      formatting at all.
 
 def format_bar(count, bar_char):
@@ -170,19 +170,18 @@ def print_results(result, filename, config):
 
 
 # Q4: Any small Function problems?
-# AQ4: Yeah, the original function was like 40 lines doing everything. Fixed by making
-#      each function super short (like 2-10 lines max) and giving them clear names.
-#      Now you can read any function in 5 seconds and know exactly what it does.
-#      Much easier to test individual pieces too.
+# AQ4: The original function was 40 lines that did everything. Fixed by making
+#      each function short (10 lines max) and giving them clear names.
+#      Now you can read any function quickly and know exactly what it does.
 
 def count_words(file="essay.txt", config=None):
     """Main entry point - orchestrates model and presentation"""
     if config is None:
         config = CONFIG
     
-    # Q1: Here's where we tie it all together - model first, then presentation
-    # AQ1: Notice how we do all the data processing first (read + process_text),
-    #      then pass the results to print_results. Clean separation - no mixing!
+    # Q1: Model first, then presentation
+    # AQ1: We do all the data processing first (read + process_text),
+    #      then pass the results to print_results. This results in clean separation with no mixing of functionality.
     text = read_text_file(file)
     result = process_text(text, config)
     print_results(result, file, config)
